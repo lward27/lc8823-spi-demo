@@ -502,9 +502,9 @@ print("SPI_DEVICE:", SPI_DEVICE)
 print("SPI_SPEED_HZ:", SPI_SPEED_HZ)
 print("BRIGHTNESS:", BRIGHTNESS)
 
-# One Cycle with one step and a pause of three seconds. Hence three seconds of white light
-print('Three Seconds of white light')
-my_cycle = Solid(num_led=NUM_LED, pause_value=3,
+# One Cycle with one step and a pause of two seconds. Hence two seconds of white light
+print('Two Seconds of white light')
+my_cycle = Solid(num_led=NUM_LED, pause_value=2,
                  num_steps_per_cycle=1, num_cycles=1, global_brightness=BRIGHTNESS)
 my_cycle.start()
 
@@ -526,8 +526,8 @@ my_cycle = TheaterChase(num_led=NUM_LED, pause_value=0.04, num_steps_per_cycle=3
                         global_brightness=BRIGHTNESS)
 my_cycle.start()
 
-# Hundred slow trips through the rainbow
-print('Hundred slow trips through the rainbow')
-my_cycle = Rainbow(num_led=NUM_LED, pause_value=0, num_steps_per_cycle=255, num_cycles=100,
+# Ten slow trips through the rainbow
+print('Ten slow trips through the rainbow')
+my_cycle = Rainbow(num_led=NUM_LED, pause_value=0, num_steps_per_cycle=255, num_cycles=10,
                    global_brightness=BRIGHTNESS)
 my_cycle.start()
