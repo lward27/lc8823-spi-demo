@@ -1,7 +1,6 @@
 import socket
 import spidev
 import sys
-import time
 from math import ceil
 
 
@@ -293,113 +292,6 @@ class APA102:
         print(self.leds)
 
 
-class ColorCycleTemplate:
-    """This class is the basis of all color cycles.
-    This file is usually used "as is" and not being changed.
-
-    A specific color cycle must subclass this template, and implement at least the
-    'update' method.
-    """
-
-    def __init__(self, num_led, pause_value=0, num_steps_per_cycle=100, num_cycles=-1, global_brightness=4):
-        self.num_led = num_led  # The number of LEDs in the strip
-        self.pause_value = pause_value  # How long to pause between two runs
-        self.num_steps_per_cycle = num_steps_per_cycle  # Steps in one cycle.
-        self.num_cycles = num_cycles  # How many times will the program run
-        self.global_brightness = global_brightness  # Overall brightness of the strip
-
-    def init(self, strip, num_led):
-        """This method is called to initialize a color program.
-
-        The default does nothing. A particular subclass could setup
-        variables, or even light the strip in an initial color.
-        """
-        pass
-
-    def shutdown(self, strip, num_led):
-        """This method is called before exiting.
-
-        The default does nothing
-        """
-        pass
-
-    def update(self, strip, num_led, num_steps_per_cycle, current_step,
-               current_cycle):
-        """This method paints one subcycle. It must be implemented.
-
-        current_step:  This goes from zero to numStepsPerCycle-1, and then
-          back to zero. It is up to the subclass to define what is done in
-          one cycle. One cycle could be one pass through the rainbow.
-          Or it could be one pixel wandering through the entire strip
-          (so for this case, the numStepsPerCycle should be equal to numLEDs).
-        current_cycle: Starts with zero, and goes up by one whenever a full
-          cycle has completed.
-        """
-
-        raise NotImplementedError("Please implement the update() method")
-
-    def cleanup(self, strip):
-        """Cleanup method."""
-        self.shutdown(strip, self.num_led)
-        strip.clear_strip()
-        strip.cleanup()
-
-    def start(self):
-        """This method does the actual work."""
-        strip = None
-        try:
-            strip = APA102(num_led=self.num_led, global_brightness=self.global_brightness)  # Initialize the strip
-            strip.clear_strip()
-            self.init(strip, self.num_led)  # Call the subclasses init method
-            strip.show()
-            current_cycle = 0
-            while True:  # Loop forever
-                for current_step in range(self.num_steps_per_cycle):
-                    need_repaint = self.update(strip, self.num_led,
-                                               self.num_steps_per_cycle,
-                                               current_step, current_cycle)
-                    if need_repaint:
-                        strip.show()  # repaint if required
-                    time.sleep(self.pause_value)  # Pause until the next step
-                current_cycle += 1
-                if self.num_cycles != -1 and current_cycle >= self.num_cycles:
-                    break
-            # Finished, cleanup everything
-            self.cleanup(strip)
-
-        except KeyboardInterrupt:  # Ctrl-C can halt the light program
-            print('Interrupted...')
-            if strip is not None:
-                strip.cleanup()
-
-
-class Rainbow(ColorCycleTemplate):
-    """Paints a rainbow effect across the entire strip."""
-
-    def update(self, strip, num_led, num_steps_per_cycle, current_step,
-               current_cycle):
-        # One cycle = One trip through the color wheel, 0..254
-        # Few cycles = quick transition, lots of cycles = slow transition
-        # -> LED 0 goes from index 0 to 254 in numStepsPerCycle cycles.
-        #     So it might have to step up more or less than one index
-        #     depending on numStepsPerCycle.
-        # -> The other LEDs go up to 254, then wrap around to zero and go up
-        #     again until the last one is just below LED 0. This way, the
-        #     strip always shows one full rainbow, regardless of the
-        #     number of LEDs
-        scale_factor = 255 / num_led  # Index change between two neighboring LEDs
-        start_index = 255 / num_steps_per_cycle * current_step  # LED 0
-        for i in range(num_led):
-            # Index of LED i, not rounded and not wrapped at 255
-            led_index = start_index + i * scale_factor
-            # Now rounded and wrapped
-            led_index_rounded_wrapped = int(round(led_index, 0)) % 255
-            # Get the actual color out of the wheel
-            pixel_color = strip.wheel(led_index_rounded_wrapped)
-            strip.set_pixel_rgb(i, pixel_color)
-        return 1  # All pixels are set in the buffer, so repaint the strip now
-
-
 SPI_BUS = 1
 SPI_DEVICE = 0
 SPI_SPEED_HZ = 500000 * 3
@@ -426,15 +318,10 @@ print("SPI_DEVICE:", SPI_DEVICE)
 print("SPI_SPEED_HZ:", SPI_SPEED_HZ)
 print("BRIGHTNESS:", BRIGHTNESS)
 
-print('Five fast trips through the rainbow')
-my_cycle = Rainbow(num_led=NUM_LED, pause_value=0, num_steps_per_cycle=30 * 3, num_cycles=5,
-                   global_brightness=BRIGHTNESS)
-my_cycle.start()
-
-print("Initializing LED strip to black...")
-
 strip = APA102(num_led=NUM_LED, global_brightness=BRIGHTNESS)  # Initialize the strip
-strip.clear_strip()
+
+# print("Initializing LED strip to black...")
+# strip.clear_strip()
 
 print("Listening on UDP...")
 UDP_IP = "0.0.0.0"
