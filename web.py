@@ -22,25 +22,25 @@ SPI_DEVICE = 0
 SPI_SPEED_HZ = 500000 * 3
 BRIGHTNESS = 1  # Is already too bright
 
-if len(sys.argv) > 1:
-    print("Setting SPI_BUS to %s" % sys.argv[1])
-    SPI_BUS = int(sys.argv[1])
+# if len(sys.argv) > 1:
+#     print("Setting SPI_BUS to %s" % sys.argv[1])
+#     SPI_BUS = int(sys.argv[1])
 
-if len(sys.argv) > 2:
-    print("Setting SPI_DEVICE to %s" % sys.argv[2])
-    SPI_DEVICE = int(sys.argv[2])
+# if len(sys.argv) > 2:
+#     print("Setting SPI_DEVICE to %s" % sys.argv[2])
+#     SPI_DEVICE = int(sys.argv[2])
 
-if len(sys.argv) > 3:
-    print("Setting SPI_SPEED_HZ to %s" % sys.argv[3])
-    SPI_SPEED_HZ = int(sys.argv[3])
+# if len(sys.argv) > 3:
+#     print("Setting SPI_SPEED_HZ to %s" % sys.argv[3])
+#     SPI_SPEED_HZ = int(sys.argv[3])
 
-if len(sys.argv) > 4:
-    print("Setting BRIGHTNESS to %s" % sys.argv[4])
-    BRIGHTNESS = int(sys.argv[4])
+# if len(sys.argv) > 4:
+#     print("Setting BRIGHTNESS to %s" % sys.argv[4])
+#     BRIGHTNESS = int(sys.argv[4])
 
-if len(sys.argv) > 5:
-    print("Setting PROGRAM to %s" % sys.argv[5])
-    PROGRAM = str(sys.argv[5])
+# if len(sys.argv) > 5:
+#     print("Setting PROGRAM to %s" % sys.argv[5])
+#     PROGRAM = str(sys.argv[5])
 
 print("SPI_BUS:", SPI_BUS)
 print("SPI_DEVICE:", SPI_DEVICE)
