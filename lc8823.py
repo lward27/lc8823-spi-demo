@@ -12,12 +12,13 @@ class ColorCycleTemplate:
     'update' method.
     """
 
-    def __init__(self, num_led, pause_value=0, num_steps_per_cycle=100, num_cycles=-1, global_brightness=4):
+    def __init__(self, num_led, strip, pause_value=0, num_steps_per_cycle=100, num_cycles=-1, global_brightness=4):
         self.num_led = num_led  # The number of LEDs in the strip
         self.pause_value = pause_value  # How long to pause between two runs
         self.num_steps_per_cycle = num_steps_per_cycle  # Steps in one cycle.
         self.num_cycles = num_cycles  # How many times will the program run
         self.global_brightness = global_brightness  # Overall brightness of the strip
+        self.strip = strip
 
     def init(self, strip, num_led):
         """This method is called to initialize a color program.
@@ -57,31 +58,31 @@ class ColorCycleTemplate:
 
     def start(self):
         """This method does the actual work."""
-        strip = None
+        #strip = None
         try:
-            strip = APA102(num_led=self.num_led, global_brightness=self.global_brightness)  # Initialize the strip
-            strip.clear_strip()
-            self.init(strip, self.num_led)  # Call the subclasses init method
-            strip.show()
+            #strip = APA102(num_led=self.num_led, global_brightness=self.global_brightness)  # Initialize the strip
+            self.strip.clear_strip()
+            self.init(self.strip, self.num_led)  # Call the subclasses init method
+            self.strip.show()
             current_cycle = 0
             while True:  # Loop forever
                 for current_step in range(self.num_steps_per_cycle):
-                    need_repaint = self.update(strip, self.num_led,
+                    need_repaint = self.update(self.strip, self.num_led,
                                                self.num_steps_per_cycle,
                                                current_step, current_cycle)
                     if need_repaint:
-                        strip.show()  # repaint if required
+                        self.strip.show()  # repaint if required
                     time.sleep(self.pause_value)  # Pause until the next step
                 current_cycle += 1
                 if self.num_cycles != -1 and current_cycle >= self.num_cycles:
                     break
             # Finished, cleanup everything
-            self.cleanup(strip)
+            #self.cleanup(self.strip)
 
         except KeyboardInterrupt:  # Ctrl-C can halt the light program
             print('Interrupted...')
-            if strip is not None:
-                strip.cleanup()
+            if self.strip is not None:
+                self.strip.cleanup()
 
 
 class StrandTest(ColorCycleTemplate):
@@ -191,6 +192,5 @@ class Rainbow(ColorCycleTemplate):
             pixel_color = strip.wheel(led_index_rounded_wrapped)
             strip.set_pixel_rgb(i, pixel_color)
         return 1  # All pixels are set in the buffer, so repaint the strip now
-
 
 

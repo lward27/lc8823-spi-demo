@@ -10,33 +10,34 @@ import lc8823
 def run_demo(lg):
     # One Cycle with one step and a pause of two seconds. Hence two seconds of white light
     print('Two Seconds of white light')
-    my_cycle = lc8823.Solid(num_led=NUM_LED, pause_value=2,
-                    num_steps_per_cycle=1, num_cycles=1, global_brightness=BRIGHTNESS)
+    my_cycle = lc8823.Solid(num_led=lg.strip.num_led, strip=lg.strip, pause_value=2,
+                    num_steps_per_cycle=1, num_cycles=1, global_brightness=lg.strip.global_brightness)
     my_cycle.start()
 
     # Go twice around the clock
     print('Go twice around the clock')
-    my_cycle = lc8823.RoundAndRound(num_led=NUM_LED, pause_value=0, num_steps_per_cycle=NUM_LED, num_cycles=2,
-                            global_brightness=BRIGHTNESS)
+    my_cycle = lc8823.RoundAndRound(num_led=lg.strip.num_led, strip=lg.strip, pause_value=0, num_steps_per_cycle=NUM_LED, num_cycles=2,
+                            global_brightness=lg.strip.global_brightness)
     my_cycle.start()
 
     # One cycle of red, green and blue each
     print('One strandtest of red, green and blue each')
-    my_cycle = lc8823.StrandTest(num_led=NUM_LED, pause_value=0, num_steps_per_cycle=NUM_LED, num_cycles=3,
-                        global_brightness=BRIGHTNESS)
+    my_cycle = lc8823.StrandTest(num_led=lg.strip.num_led, strip=lg.strip, pause_value=0, num_steps_per_cycle=NUM_LED, num_cycles=3,
+                        global_brightness=lg.strip.global_brightness)
     my_cycle.start()
 
     # Five quick trips through the rainbow
     print('Five quick trips through the rainbow')
-    my_cycle = lc8823.TheaterChase(num_led=NUM_LED, pause_value=0.04, num_steps_per_cycle=35, num_cycles=5,
-                            global_brightness=BRIGHTNESS)
+    my_cycle = lc8823.TheaterChase(num_led=lg.strip.num_led, strip=lg.strip, pause_value=0.04, num_steps_per_cycle=35, num_cycles=5,
+                            global_brightness=lg.strip.global_brightness)
     my_cycle.start()
 
     # Ten slow trips through the rainbow
     print('Ten slow trips through the rainbow')
-    my_cycle = lc8823.Rainbow(num_led=NUM_LED, pause_value=0, num_steps_per_cycle=255, num_cycles=10,
-                    global_brightness=BRIGHTNESS)
+    my_cycle = lc8823.Rainbow(num_led=lg.strip.num_led, strip=lg.strip, pause_value=0, num_steps_per_cycle=255, num_cycles=10,
+                    global_brightness=lg.strip.global_brightness)
     my_cycle.start()
+    my_cycle.cleanup(lg.strip)
 
 async def main(lg):
     await asyncio.gather(lg.get_new_variables(), lg.receive_vid_stream())
