@@ -37,7 +37,7 @@ def run_demo(lg):
     my_cycle = lc8823.Rainbow(num_led=lg.strip.num_led, strip=lg.strip, pause_value=0, num_steps_per_cycle=255, num_cycles=10,
                     global_brightness=lg.strip.global_brightness)
     my_cycle.start()
-    my_cycle.cleanup(lg.strip)
+    lg.strip.clear_strip()
 
 async def main(lg):
     await asyncio.gather(lg.get_new_variables(), lg.receive_vid_stream())
@@ -96,6 +96,7 @@ if __name__ == "__main__":
         asyncio.run(main(lg))
     if(PROGRAM == "lc8823.py"):
         run_demo(lg)
+        asyncio.run(main(lg))
 
 
 
