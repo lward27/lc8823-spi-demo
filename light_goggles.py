@@ -31,8 +31,11 @@ class LightGoggles:
             # print(colored(colors[0], colors[1], colors[2], "O")) # show ANSI colors for debugging
 
             for i in range(self.strip.num_led):  # fill the strip with the same color
-                self.strip.set_pixel(i, colors[0], colors[1], colors[2],
-                                1)  # 1% brightness, but does not seem to make any difference
+                self.strip.set_pixel(i, 
+                    colors[0]//self.strip.global_brightness, 
+                    colors[1]//self.strip.global_brightness, 
+                    colors[2]//self.strip.global_brightness,
+                    1)  # 1% brightness, but does not seem to make any difference
             self.strip.show()
             await asyncio.sleep(0)
 

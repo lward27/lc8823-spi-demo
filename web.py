@@ -14,13 +14,14 @@ async def printstuff():
         await asyncio.sleep(1)
         print("beep!")
 
-async def main(lg):
-    await asyncio.gather(lg.get_new_variables(), lg.receive_vid_stream())
+# async def main(lg):
+#     await asyncio.gather(lg.get_new_variables(), lg.receive_vid_stream())
 
 SPI_BUS = 1
 SPI_DEVICE = 0
 SPI_SPEED_HZ = 500000 * 3
 BRIGHTNESS = 1  # Is already too bright
+PROGRAM = "flashen.py"
 
 # if len(sys.argv) > 1:
 #     print("Setting SPI_BUS to %s" % sys.argv[1])
@@ -76,6 +77,19 @@ async def read_root():
     return {"Hello": "World"}
 
 
-@app.get("/items/{item_id}")
-async def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+@app.get("/goggles/brightness")
+async def read_brightness():
+    return {"brightness": lg.strip.global_brightness}
+
+@app.post("/goggles/brightness/{brightness}")
+async def set_brightness(brightness: int, q: Union[str, None] = None):
+    lg.strip.global_brightness = brightness
+    return {"brightness": brightness, "q": q}
+
+@app.post("/goggles/program/{program}")
+async def set_program(program: str, q: Union[str, None] = None):
+    return {"program": program, "q":q}
+    
+
+
+
