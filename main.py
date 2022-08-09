@@ -20,6 +20,7 @@ strip = led_driver.APA102(num_led=NUM_LED,
 #Initialize UDP
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((UDP_IP, UDP_PORT))
+sock.setblocking(0)
 
 #Initialize Goggles
 lg = light_goggles.LightGoggles(strip, sock)
@@ -30,10 +31,9 @@ app = FastAPI()
 async def startup_event():
     loop = asyncio.get_running_loop()
     #loop.create_task(lg.get_new_variables())
-    #loop.create_task(goggle_light_show_templates.show_R(lg))
     loop.create_task(lg.receive_vid_stream())
+    loop.create_task(lg.manage_rest_mode())
     
-    #await asyncio.gather(lg.get_new_variables())
 
 @app.get("/")
 async def read_root():
@@ -49,13 +49,6 @@ async def set_brightness(brightness: int, q: Union[str, None] = None):
     lg.strip.global_brightness = brightness
     return {"brightness": brightness, "q": q}
 
-@app.post("/goggles/mode/{mode}")
-async def set_mode(mode: str, q: Union[str, None] = None):
-    if mode == "rest":
-        lg.rest_mode = True
-    if mode == "play":
-        lg.rest_mode = False
-    return {"mode": mode, "q":q}
 
 
 
