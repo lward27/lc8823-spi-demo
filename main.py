@@ -42,11 +42,11 @@ async def read_root():
 
 @app.get("/goggles/brightness")
 async def read_brightness():
-    return {"brightness": lg.strip.global_brightness}
+    return {"brightness": lg.color_divider}
 
 @app.post("/goggles/brightness/{brightness}")
 async def set_brightness(brightness: int, q: Union[str, None] = None):
-    lg.strip.global_brightness = brightness
+    lg.color_divider = brightness
     return {"brightness": brightness, "q": q}
 
 

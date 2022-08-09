@@ -1,6 +1,6 @@
 import asyncio
 import time
-from goggle_light_show_templates import show_R
+#from goggle_light_show_templates import show_R
 from constants import r
 
 
@@ -38,12 +38,13 @@ class LightGoggles:
         Handles turning restmode on when nothing is coming over the socket
 
     """
-    def __init__(self, strip, sock, rest_mode=True):
+    def __init__(self, strip, sock, rest_mode=True, color_divider=1):
         self.strip = strip # Initialized in main.py
         self.sock = sock # Initialized in main.py
         self.rest_mode = rest_mode # Goggles start in rest mode
         self.last_received_socket_communication = time.time() 
         self.last_last_received_socket_communication = self.last_received_socket_communication-1
+        self.color_divider = color_divider
 
     def show_R(self):
         for i in range(len(r)):  # fill the strip with the same color
@@ -55,11 +56,25 @@ class LightGoggles:
     def show_solid_color(self, colors):
         for i in range(self.strip.num_led):  # fill the strip with the same color
             self.strip.set_pixel(i, 
-                colors[0]//self.strip.global_brightness, 
-                colors[1]//self.strip.global_brightness, 
-                colors[2]//self.strip.global_brightness,
+                colors[0]//self.color_divider, 
+                colors[1]//self.color_divider, 
+                colors[2]//self.color_divider,
                 1)  # 1% brightness, but does not seem to make any difference
         self.strip.show()
+
+    def fade(self):
+        current_pixel = self.strip.get_pixel(0)
+        print(current_pixel)
+        
+        for j in range(100):
+            for i in range(self.strip.num_led):
+                self.strip.set_pixel(i, 
+                    current_pixel["red"]//(j+1), 
+                    current_pixel["blue"]//(j+1), 
+                    current_pixel["green"]//(j+1),
+                    1)  # 1% brightness, but does not seem to make any difference
+            self.strip.show()
+            time.sleep(.01)
 
     async def receive_vid_stream(self):
         while True:
@@ -92,7 +107,9 @@ class LightGoggles:
         while True:
             print(self.last_received_socket_communication) # Debug
             if(self.last_received_socket_communication == self.last_last_received_socket_communication):
-                print("nothing playing for 5 seconds, starting rest mode...")
+                #print("nothing playing for 5 seconds, starting rest mode...")
+                if(self.rest_mode == False):
+                    self.fade()
                 self.rest_mode = True
                 self.show_R()
             self.last_last_received_socket_communication = self.last_received_socket_communication
