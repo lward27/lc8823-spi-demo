@@ -3,62 +3,98 @@ import time
 from goggle_light_show_templates import show_R
 from constants import r
 
-# start = time.time()
-
-# print(23*2.3)
-
-# end = time.time()
-# print(end - start)
 
 class LightGoggles:
+    """
+    A class used to represent a pair of Resonate Light Goggles
+
+    ...
+
+    Attributes
+    ----------
+    strip : APA102
+        An object representing an LED Strip
+    sock : socket
+        An object representing a unix socket
+    rest_mode : boolean
+        Represents if the goggles are currently in restmode, if false, something is playing!
+    last_received_socket_communication : int
+        the linux time that last communication was received over the socket
+    last_last_received_socket_communication : int
+        the linux time that the time before last communication was received over the socket
+        combined with previous attributes, the goggles object has knowledge if information is
+        flowing over the socket
+
+    Methods
+    -------
+    show_R()
+        Displays the Resonate "R" on the light goggles, used for Rest Mode
+    show_solid_color(colors)
+        accepts a byte string of colors.  Colors are represented by 3 2 digit hexidecimal
+        values, i.e. 24 bit color.
+    async receive_vid_stream()
+        Streams video to light goggles over socket
+    async manage_rest_mode()
+        Handles turning restmode on when nothing is coming over the socket
+
+    """
     def __init__(self, strip, sock, rest_mode=True):
-        self.strip = strip
-        self.sock = sock
-        self.rest_mode = rest_mode
-        self.last_received_socket_communication = time.time()
+        self.strip = strip # Initialized in main.py
+        self.sock = sock # Initialized in main.py
+        self.rest_mode = rest_mode # Goggles start in rest mode
+        self.last_received_socket_communication = time.time() 
         self.last_last_received_socket_communication = self.last_received_socket_communication-1
 
     def show_R(self):
         for i in range(len(r)):  # fill the strip with the same color
-                    self.strip.set_pixel(i, r[i][0], r[i][1], r[i][2],
+                    # R image is stored in constants.py file
+                    self.strip.set_pixel(i, r[i][0], r[i][1], r[i][2], 
                                         1)  # 1% brightness, but does not seem to make any difference
+        self.strip.show() 
+    
+    def show_solid_color(self, colors):
+        for i in range(self.strip.num_led):  # fill the strip with the same color
+            self.strip.set_pixel(i, 
+                colors[0]//self.strip.global_brightness, 
+                colors[1]//self.strip.global_brightness, 
+                colors[2]//self.strip.global_brightness,
+                1)  # 1% brightness, but does not seem to make any difference
         self.strip.show()
 
-    
     async def receive_vid_stream(self):
         while True:
+            # Try, because this is non-blocking socket, if no communcation
+            # comes over the socket, a BlockingIOError is thrown
             try:
                 data, addr = self.sock.recvfrom(512)
+                self.rest_mode = False # If we make it this far, socket comms are happening
                 # Capture last received data - used for rest mode.
                 self.last_received_socket_communication = time.time()
-                
                 # parse the bytes, splitting by newline-bytes
                 lines = data.split(b'\n')
                 # get the 4th line, or skip.
                 if len(lines) < 4:
                     continue
+
                 colors = lines[3]
-                if len(colors) < 3:
+                if len(colors) < 3: # Skip color values that don't make sense!
                     continue
-                for i in range(self.strip.num_led):  # fill the strip with the same color
-                    self.strip.set_pixel(i, 
-                        colors[0]//self.strip.global_brightness, 
-                        colors[1]//self.strip.global_brightness, 
-                        colors[2]//self.strip.global_brightness,
-                        1)  # 1% brightness, but does not seem to make any difference
-                self.strip.show()
+                self.show_solid_color(colors)
+
             except BlockingIOError:
                 #print("nothing to stream")
                 continue
+
             finally:
-                await asyncio.sleep(0)
+                await asyncio.sleep(0) #give control back to the loop regardless of socket comms.
 
     async def manage_rest_mode(self):
         while True:
-            print(self.last_received_socket_communication)
+            print(self.last_received_socket_communication) # Debug
             if(self.last_received_socket_communication == self.last_last_received_socket_communication):
                 print("nothing playing for 5 seconds, starting rest mode...")
+                self.rest_mode = True
                 self.show_R()
             self.last_last_received_socket_communication = self.last_received_socket_communication
-            await asyncio.sleep(5)
+            await asyncio.sleep(5) # Toggle how long rest_mode takes to start up.
 
