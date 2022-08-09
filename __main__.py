@@ -4,8 +4,14 @@ import sys
 import led_driver
 import light_goggles
 import socket
-from constants import NUM_LED, UDP_IP, UDP_PORT
+from constants import NUM_LED, UDP_IP, UDP_PORT, r
 import lc8823
+
+def show_R(lg):
+    for i in range(len(r)):  # fill the strip with the same color
+        lg.strip.set_pixel(i, r[i][0], r[i][1], r[i][2],
+                                1)  # 1% brightness, but does not seem to make any difference
+    lg.strip.show()
 
 def run_demo(lg):
     # One Cycle with one step and a pause of two seconds. Hence two seconds of white light
@@ -43,14 +49,16 @@ async def main(lg):
     await asyncio.gather(lg.get_new_variables(), lg.receive_vid_stream())
 
 
-
 if __name__ == "__main__":
+
+    
 
     ## TODO: READ COMMAND LINES, named command line args
     SPI_BUS = 1
     SPI_DEVICE = 0
     SPI_SPEED_HZ = 500000 * 3
     BRIGHTNESS = 1  # Is already too bright
+    PROGRAM = "lc8823.py"
 
     if len(sys.argv) > 1:
         print("Setting SPI_BUS to %s" % sys.argv[1])
@@ -97,6 +105,8 @@ if __name__ == "__main__":
     if(PROGRAM == "lc8823.py"):
         run_demo(lg)
         asyncio.run(main(lg))
+    if(PROGRAM == "showR"):
+        show_R(lg)
 
 
 
