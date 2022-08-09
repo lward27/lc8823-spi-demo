@@ -194,13 +194,6 @@ class Rainbow(ColorCycleTemplate):
             strip.set_pixel_rgb(i, pixel_color)
         return 1  # All pixels are set in the buffer, so repaint the strip now
 
-
-def show_R(lg):
-    for i in range(len(r)):  # fill the strip with the same color
-        lg.strip.set_pixel(i, r[i][0], r[i][1], r[i][2],
-                            1)  # 1% brightness, but does not seem to make any difference
-    lg.strip.show()
-
 def run_demo(lg):
     # One Cycle with one step and a pause of two seconds. Hence two seconds of white light
     print('Two Seconds of white light')
