@@ -39,7 +39,7 @@ class LightGoggles:
             self.strip.show()
             await asyncio.sleep(0)
 
-    async def get_new_variables(self):
-        while(True):
-            await asyncio.sleep(1)
-            print("Getting new variables now!")
+    # async def get_new_variables(self):
+    #     while(True):
+    #         await asyncio.sleep(1)
+    #         print("Getting new variables now!")

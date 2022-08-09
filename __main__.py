@@ -6,6 +6,8 @@ import light_goggles
 import socket
 from constants import NUM_LED, UDP_IP, UDP_PORT, r
 import lc8823
+from fastapi import FastAPI
+
 
 def show_R(lg):
     for i in range(len(r)):  # fill the strip with the same color
@@ -46,7 +48,14 @@ def run_demo(lg):
     lg.strip.clear_strip()
 
 async def main(lg):
-    await asyncio.gather(lg.get_new_variables(), lg.receive_vid_stream())
+    app = FastAPI()
+
+    @app.on_event("startup")
+    async def startup_event():
+        loop = asyncio.get_running_loop()
+        loop.create_task(lg.get_new_variables())
+        #loop.create_task(lg.receive_vid_stream())
+    #await asyncio.gather(lg.get_new_variables(), lg.receive_vid_stream())
 
 
 if __name__ == "__main__":
@@ -58,7 +67,7 @@ if __name__ == "__main__":
     SPI_DEVICE = 0
     SPI_SPEED_HZ = 500000 * 3
     BRIGHTNESS = 1  # Is already too bright
-    PROGRAM = "lc8823.py"
+    #PROGRAM = "flashen.py"
 
     if len(sys.argv) > 1:
         print("Setting SPI_BUS to %s" % sys.argv[1])
@@ -76,15 +85,15 @@ if __name__ == "__main__":
         print("Setting BRIGHTNESS to %s" % sys.argv[4])
         BRIGHTNESS = int(sys.argv[4])
 
-    if len(sys.argv) > 5:
-        print("Setting PROGRAM to %s" % sys.argv[5])
-        PROGRAM = str(sys.argv[5])
+    # if len(sys.argv) > 5:
+    #     print("Setting PROGRAM to %s" % sys.argv[5])
+    #     PROGRAM = str(sys.argv[5])
 
-    print("SPI_BUS:", SPI_BUS)
-    print("SPI_DEVICE:", SPI_DEVICE)
-    print("SPI_SPEED_HZ:", SPI_SPEED_HZ)
-    print("BRIGHTNESS:", BRIGHTNESS)
-    print("PROGRAM:", PROGRAM)
+    # print("SPI_BUS:", SPI_BUS)
+    # print("SPI_DEVICE:", SPI_DEVICE)
+    # print("SPI_SPEED_HZ:", SPI_SPEED_HZ)
+    # print("BRIGHTNESS:", BRIGHTNESS)
+    #print("PROGRAM:", PROGRAM)
 
     #Initialize Strip
     strip = led_driver.APA102(num_led=NUM_LED, 
@@ -100,13 +109,8 @@ if __name__ == "__main__":
     #Initialize Goggles
     lg = light_goggles.LightGoggles(strip, sock)
 
-    if(PROGRAM == "flashen.py"):
-        asyncio.run(main(lg))
-    if(PROGRAM == "lc8823.py"):
-        run_demo(lg)
-        asyncio.run(main(lg))
-    if(PROGRAM == "showR"):
-        show_R(lg)
+
+    asyncio.run(main(lg))
 
 
 
