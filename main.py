@@ -9,12 +9,17 @@ import socket
 from constants import NUM_LED, UDP_IP, UDP_PORT, r, SPI_BUS, SPI_DEVICE, SPI_SPEED_HZ, BRIGHTNESS
 from fastapi import FastAPI
 
+defaults = None
+with open('/etc/default/lc8823-demo', 'r') as f:
+    defaults = {k[0] : k[1] for k in [x.strip('\n').split('=') for x in f.readlines()]}
+print(defaults)
+
 #Initialize Strip
 strip = led_driver.APA102(num_led=NUM_LED, 
-                            global_brightness=BRIGHTNESS, 
+                            global_brightness=int(defaults['LED_BRIGHTNESS']), 
                             SPI_BUS=SPI_BUS, 
                             SPI_DEVICE=SPI_DEVICE,
-                            SPI_SPEED_HZ=SPI_SPEED_HZ)  # Initialize the strip
+                            SPI_SPEED_HZ=int(defaults['SPI_SPEED']))  # Initialize the strip
 
 #Initialize UDP
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -38,7 +43,6 @@ async def startup_event():
 @app.get("/")
 async def read_root():
     return {"Hello": "World"}
-
 
 @app.get("/goggles/brightness")
 async def read_brightness():
