@@ -10,15 +10,22 @@ import socket
 from constants import NUM_LED, UDP_IP, UDP_PORT, r, SPI_BUS, SPI_DEVICE, SPI_SPEED_HZ, BRIGHTNESS
 from fastapi import FastAPI
 from tags import tags_metadata
+from models import HardwareConfig
+
+hardware_config_options = {}
 
 def read_hardware_config_file():
     with open('/etc/default/lc8823-demo', 'r') as f:
-        defaults = {k[0] : k[1] for k in [x.strip('\n').split('=') for x in f.readlines()]}
-    return defaults
+        hardware_config_options = {k[0] : k[1] for k in [x.strip('\n').split('=') for x in f.readlines()]}
+    return hardware_config_options
 
-def write_hardware_config_file():
+def write_hardware_config_file(config_string):
     with open('/etc/default/lc8823-demo', 'w') as f:
-        f.write("SPI_SPEED=1500000\nLED_BRIGHTNESS=5\nSPI_PROGRAM=flashen.py\n")
+        f.write(config_string)
+
+def serialize_config_options(hardware_config_parameters):
+    print(hardware_config_parameters.spi_speed)
+    return f"SPI_SPEED={hardware_config_parameters.spi_speed}\nLED_BRIGHTNESS={hardware_config_parameters.led_brightness}\n"
 
 def setup_goggles():
     defaults = read_hardware_config_file()
@@ -78,10 +85,11 @@ async def read_goggle_state():
 async def read_hardware_config():
     return read_hardware_config_file()
 
-@app.post("/goggles/hardware/{config}", tags=["Hardware Config"])
-async def update_hardware_config():
-    write_hardware_config_file()
-    return("beep boop")
+@app.post("/goggles/hardware", tags=["Hardware Config"])
+async def update_hardware_config(hardware_config: HardwareConfig):
+    print("I'm here")
+    write_hardware_config_file(serialize_config_options(hardware_config))
+    return(hardware_config)
 
 @app.get("/goggles/dimmer", tags=["Dimmer Control"])
 async def read_dimmer():
