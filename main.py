@@ -7,7 +7,6 @@ import led_driver
 import light_goggles
 import socket
 from constants import NUM_LED, UDP_IP, UDP_PORT, r, SPI_BUS, SPI_DEVICE, SPI_SPEED_HZ, BRIGHTNESS
-import goggle_light_show_templates
 from fastapi import FastAPI
 
 #Initialize Strip
@@ -21,6 +20,7 @@ strip = led_driver.APA102(num_led=NUM_LED,
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((UDP_IP, UDP_PORT))
 sock.setblocking(0)
+
 
 #Initialize Goggles
 lg = light_goggles.LightGoggles(strip, sock)

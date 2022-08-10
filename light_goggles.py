@@ -2,7 +2,7 @@ import asyncio
 import time
 #from goggle_light_show_templates import show_R
 from constants import r
-
+from asyncio import StreamReader
 
 class LightGoggles:
     """
@@ -75,6 +75,7 @@ class LightGoggles:
                     1)  # 1% brightness, but does not seem to make any difference
             self.strip.show()
             time.sleep(.01)
+        
 
     async def receive_vid_stream(self):
         while True:
