@@ -49,7 +49,9 @@ class LightGoggles:
     def show_R(self):
         for i in range(len(r)):  # fill the strip with the same color
                     # R image is stored in constants.py file
-                    self.strip.set_pixel(i, r[i][0], r[i][1], r[i][2], 
+                    self.strip.set_pixel(i, r[i][0]//self.color_divider, 
+                                            r[i][1]//self.color_divider, 
+                                            r[i][2]//self.color_divider, 
                                         1)  # 1% brightness, but does not seem to make any difference
         self.strip.show() 
     

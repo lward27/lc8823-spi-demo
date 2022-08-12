@@ -25,10 +25,11 @@ def write_hardware_config_file(config_string):
 
 def serialize_config_options(hardware_config_parameters):
     print(hardware_config_parameters.spi_speed)
-    return f"SPI_SPEED={hardware_config_parameters.spi_speed}\nLED_BRIGHTNESS={hardware_config_parameters.led_brightness}\n"
+    return f"SPI_SPEED={hardware_config_parameters.spi_speed}\nLED_BRIGHTNESS={hardware_config_parameters.led_brightness}\nDIMMER_LEVEL={hardware_config_parameters.dimmer_level}\n"
 
 def setup_goggles():
     defaults = read_hardware_config_file()
+    print(defaults)
 
     #Initialize Strip
     strip = led_driver.APA102(num_led=NUM_LED, 
@@ -44,7 +45,7 @@ def setup_goggles():
 
 
     #Initialize Goggles
-    lg = light_goggles.LightGoggles(strip, sock)
+    lg = light_goggles.LightGoggles(strip, sock, color_divider=int(defaults["DIMMER_LEVEL"])) #DIMMER_LEVEL becomes color_divider inside the Light Goggles class
     return lg
 
 lg = setup_goggles()
