@@ -70,6 +70,10 @@ async def startup_event():
     loop.create_task(lg.receive_vid_stream())
     loop.create_task(lg.manage_rest_mode())
 
+@app.on_event("shutdown")
+def shutdown_event():
+    lg.strip.clear_strip()
+
 @app.get("/")
 async def read_root():
     return {"Welcoe to Resoante Light Goggles, check the DOCS at /docs"}

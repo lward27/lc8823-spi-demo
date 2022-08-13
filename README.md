@@ -38,3 +38,5 @@ return system dbus stuff
 
 busctl list  
 just another way to list dbus stuff  
+
+dbus-monitor --system
