@@ -101,20 +101,26 @@ class LightGoggles:
 
             except BlockingIOError:
                 #print("nothing to stream")
+                # Could start rest mode here... 
                 continue
 
             finally:
                 await asyncio.sleep(0) #give control back to the loop regardless of socket comms.
 
     async def manage_rest_mode(self):
+        #fiveminutesbefore=$((timestamp - 5 * 60 * 1000))
+        rest_mode_stop_time = None
         while True:
             print(self.last_received_socket_communication) # Debug
-            if(self.last_received_socket_communication == self.last_last_received_socket_communication):
-                #print("nothing playing for 5 seconds, starting rest mode...")
-                if(self.rest_mode == False):
-                    self.fade()
-                self.rest_mode = True
-                self.show_R()
+            if(self.last_received_socket_communication == self.last_last_received_socket_communication): #socket has stopped streaming
+                if(self.rest_mode == False): # Rest Mode Startup Section
+                    #self.fade() # Fade current lights before switching
+                    rest_mode_stop_time = (self.last_received_socket_communication + 5 * 60) # five minutes from now
+                self.rest_mode = True 
+                if(time.time() < rest_mode_stop_time):
+                    self.show_R()
+                if(time.time() >= rest_mode_stop_time):
+                    self.strip.clear_strip()
             self.last_last_received_socket_communication = self.last_received_socket_communication
-            await asyncio.sleep(5) # Toggle how long rest_mode takes to start up.
+            await asyncio.sleep(1) # Toggle how long rest_mode takes to start up.
 
