@@ -38,7 +38,7 @@ class LightGoggles:
         Handles turning restmode on when nothing is coming over the socket
 
     """
-    def __init__(self, strip, sock, rest_mode=True, color_divider=1):
+    def __init__(self, strip, sock, rest_mode=False, color_divider=1):
         self.strip = strip # Initialized in main.py
         self.sock = sock # Initialized in main.py
         self.rest_mode = rest_mode # Goggles start in rest mode
@@ -117,10 +117,11 @@ class LightGoggles:
                     #self.fade() # Fade current lights before switching
                     rest_mode_stop_time = (self.last_received_socket_communication + 5 * 60) # five minutes from now
                 self.rest_mode = True 
-                if(time.time() < rest_mode_stop_time):
-                    self.show_R()
-                if(time.time() >= rest_mode_stop_time):
-                    self.strip.clear_strip()
+                if(rest_mode_stop_time):
+                    if(time.time() < rest_mode_stop_time):
+                        self.show_R()
+                    if(time.time() >= rest_mode_stop_time):
+                        self.strip.clear_strip()
             self.last_last_received_socket_communication = self.last_received_socket_communication
             await asyncio.sleep(1) # Toggle how long rest_mode takes to start up.
 
