@@ -66,7 +66,7 @@ class LightGoggles:
 
     def fade(self):
         current_pixel = self.strip.get_pixel(0)
-        print(current_pixel)
+        #print(current_pixel)
         
         for j in range(100):
             for i in range(self.strip.num_led):
@@ -111,7 +111,7 @@ class LightGoggles:
         #fiveminutesbefore=$((timestamp - 5 * 60 * 1000))
         rest_mode_stop_time = None
         while True:
-            print(self.last_received_socket_communication) # Debug
+            # print(self.last_received_socket_communication) # Debug
             if(self.last_received_socket_communication == self.last_last_received_socket_communication): #socket has stopped streaming
                 if(self.rest_mode == False): # Rest Mode Startup Section
                     #self.fade() # Fade current lights before switching

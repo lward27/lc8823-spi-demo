@@ -92,7 +92,6 @@ async def read_hardware_config():
 
 @app.post("/goggles/hardware", tags=["Hardware Config"])
 async def update_hardware_config(hardware_config: HardwareConfig):
-    print("I'm here")
     write_hardware_config_file(serialize_config_options(hardware_config))
     return(hardware_config)
 
