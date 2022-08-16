@@ -10,7 +10,7 @@ import socket
 from constants import NUM_LED, UDP_IP, UDP_PORT, r, SPI_BUS, SPI_DEVICE, SPI_SPEED_HZ, BRIGHTNESS
 from fastapi import FastAPI
 from tags import tags_metadata
-from models import HardwareConfig
+from models import HardwareConfig, BrightnessControl
 
 hardware_config_options = {}
 
@@ -99,10 +99,10 @@ async def update_hardware_config(hardware_config: HardwareConfig):
 async def read_dimmer():
     return {"dimmer": lg.color_divider}
 
-@app.post("/goggles/dimmer/{dimmer}", tags=["Dimmer Control"])
-async def set_dimmer(dimmer: int):
-    lg.color_divider = dimmer
-    return {"dimmer": dimmer}
+@app.post("/goggles/dimmer", tags=["Dimmer Control"])
+async def set_dimmer(dimmer_control: BrightnessControl):
+    lg.color_divider = dimmer_control.dimmer_level
+    return {"dimmer": dimmer_control}
 
 
 
