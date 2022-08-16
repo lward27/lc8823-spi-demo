@@ -105,7 +105,7 @@ class LightGoggles:
                 continue
 
             finally:
-                await asyncio.sleep(0) #give control back to the loop regardless of socket comms.
+                await asyncio.sleep(.001) #give control back to the loop regardless of socket comms.
 
     async def manage_rest_mode(self):
         #fiveminutesbefore=$((timestamp - 5 * 60 * 1000))
