@@ -115,7 +115,7 @@ class LightGoggles:
             if(self.last_received_socket_communication == self.last_last_received_socket_communication): #socket has stopped streaming
                 if(self.rest_mode == False): # Rest Mode Startup Section
                     #self.fade() # Fade current lights before switching
-                    rest_mode_stop_time = (self.last_received_socket_communication + 5 * 60) # five minutes from now
+                    rest_mode_stop_time = (self.last_received_socket_communication + 1 * 60) # five minutes from now
                 self.rest_mode = True 
                 if(rest_mode_stop_time):
                     if(time.time() < rest_mode_stop_time):

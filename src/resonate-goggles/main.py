@@ -95,7 +95,7 @@ async def update_hardware_config(hardware_config: HardwareConfig):
     write_hardware_config_file(serialize_config_options(hardware_config))
     return(hardware_config)
 
-@app.get("/goggles/dimmer", tags=["Dimmer Control"])
+@app.get("/goggles/dimmer", response_model=BrightnessControl, tags=["Dimmer Control"])
 async def read_dimmer():
     return {"dimmer": lg.color_divider}
 
