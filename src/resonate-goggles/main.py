@@ -96,9 +96,9 @@ async def update_hardware_config(hardware_config: HardwareConfig):
     return(hardware_config)
 
 @app.get("/goggles/dimmer", response_model=BrightnessControl, tags=["Dimmer Control"])
-async def read_dimmer(dimmer_control: BrightnessControl):
-    dimmer_control.dimmer_level = lg.color_divider
-    return {dimmer_control}
+async def read_dimmer():
+    dimmer_level = lg.color_divider
+    return {"dimmer_level":dimmer_level}
 
 @app.post("/goggles/dimmer", tags=["Dimmer Control"])
 async def set_dimmer(dimmer_control: BrightnessControl):
