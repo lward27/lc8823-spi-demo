@@ -45,7 +45,7 @@ def setup_goggles():
 
 
     #Initialize Goggles
-    lg = light_goggles.LightGoggles(strip, sock, color_divider=int(defaults["DIMMER_LEVEL"])) #DIMMER_LEVEL becomes color_divider inside the Light Goggles class
+    lg = light_goggles.LightGoggles(strip, sock, dimmer_level=int(defaults["DIMMER_LEVEL"])) #DIMMER_LEVEL becomes dimmer_level inside the Light Goggles class
     return lg
 
 lg = setup_goggles()
@@ -81,7 +81,7 @@ async def read_root():
 @app.get("/goggles", tags=["State"]) #effectively returns goggles current state
 async def read_goggle_state():
     return {"brightness": lg.strip.global_brightness, 
-            "color_divider": lg.color_divider,
+            "dimmer_level": lg.dimmer_level,
             "rest_mode": lg.rest_mode,
             "last_socket_communication": datetime.fromtimestamp(lg.last_received_socket_communication),
             }
@@ -97,12 +97,12 @@ async def update_hardware_config(hardware_config: HardwareConfig):
 
 @app.get("/goggles/dimmer", response_model=BrightnessControl, tags=["Dimmer Control"])
 async def read_dimmer():
-    dimmer_level = lg.color_divider
+    dimmer_level = lg.dimmer_level
     return {"dimmer_level":dimmer_level}
 
 @app.post("/goggles/dimmer", tags=["Dimmer Control"])
 async def set_dimmer(dimmer_control: BrightnessControl):
-    lg.color_divider = dimmer_control.dimmer_level
+    lg.dimmer_level = dimmer_control.dimmer_level
     return {"dimmer": dimmer_control}
 
 

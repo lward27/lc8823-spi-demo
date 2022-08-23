@@ -38,29 +38,29 @@ class LightGoggles:
         Handles turning restmode on when nothing is coming over the socket
 
     """
-    def __init__(self, strip, sock, rest_mode=False, color_divider=1):
+    def __init__(self, strip, sock, rest_mode=False, dimmer_level=1):
         self.strip = strip # Initialized in main.py
         self.sock = sock # Initialized in main.py
         self.rest_mode = rest_mode # Goggles start in rest mode
         self.last_received_socket_communication = time.time() 
         self.last_last_received_socket_communication = self.last_received_socket_communication-1
-        self.color_divider = color_divider
+        self.dimmer_level = dimmer_level
 
     def show_R(self):
         for i in range(len(r)):  # fill the strip with the same color
                     # R image is stored in constants.py file
-                    self.strip.set_pixel(i, r[i][0]//self.color_divider, 
-                                            r[i][1]//self.color_divider, 
-                                            r[i][2]//self.color_divider, 
+                    self.strip.set_pixel(i, r[i][0]//self.dimmer_level, 
+                                            r[i][1]//self.dimmer_level, 
+                                            r[i][2]//self.dimmer_level, 
                                         1)  # 1% brightness, but does not seem to make any difference
         self.strip.show() 
     
     def show_solid_color(self, colors):
         for i in range(self.strip.num_led):  # fill the strip with the same color
             self.strip.set_pixel(i, 
-                colors[0]//self.color_divider, 
-                colors[1]//self.color_divider, 
-                colors[2]//self.color_divider,
+                colors[0]//self.dimmer_level, 
+                colors[1]//self.dimmer_level, 
+                colors[2]//self.dimmer_level,
                 1)  # 1% brightness, but does not seem to make any difference
         self.strip.show()
 
