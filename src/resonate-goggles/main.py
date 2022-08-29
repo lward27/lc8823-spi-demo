@@ -3,14 +3,13 @@ import asyncio
 from typing import Union
 from datetime import datetime
 
-import sys
 import led_driver
 import light_goggles
 import socket
-from constants import NUM_LED, UDP_IP, UDP_PORT, r, SPI_BUS, SPI_DEVICE, SPI_SPEED_HZ, BRIGHTNESS
+from constants import NUM_LED, UDP_IP, UDP_PORT, r
 from fastapi import FastAPI
 from tags import tags_metadata
-from models import HardwareConfig, BrightnessControl
+from models import BrightnessControl
 
 hardware_config_options = {}
 
@@ -19,14 +18,6 @@ def read_hardware_config_file():
         hardware_config_options = {k[0] : k[1] for k in [x.strip('\n').split('=') for x in f.readlines()]}
     return hardware_config_options
 
-def write_hardware_config_file(config_string):
-    with open('/etc/default/lc8823-demo', 'w') as f:
-        f.write(config_string)
-
-def serialize_config_options(hardware_config_parameters):
-    print(hardware_config_parameters.spi_speed)
-    return f"SPI_SPEED={hardware_config_parameters.spi_speed}\nLED_BRIGHTNESS={hardware_config_parameters.led_brightness}\nDIMMER_LEVEL={hardware_config_parameters.dimmer_level}\n"
-
 def setup_goggles():
     defaults = read_hardware_config_file()
     print(defaults)
@@ -34,9 +25,9 @@ def setup_goggles():
     #Initialize Strip
     strip = led_driver.APA102(num_led=NUM_LED, 
                                 global_brightness=int(defaults['LED_BRIGHTNESS']), 
-                                SPI_BUS=SPI_BUS, 
-                                SPI_DEVICE=SPI_DEVICE,
-                                SPI_SPEED_HZ=int(defaults['SPI_SPEED']))  # Initialize the strip
+                                SPI_BUS=defaults['SPI_BUS'], 
+                                SPI_DEVICE=['SPI_DEVICE'],
+                                SPI_SPEED_HZ=int(defaults['SPI_SPEED_HZ']))  # Initialize the strip
 
     #Initialize UDP
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -89,11 +80,6 @@ async def read_goggle_state():
 @app.get("/goggles/hardware", tags=["Hardware Config"])
 async def read_hardware_config():
     return read_hardware_config_file()
-
-@app.post("/goggles/hardware", tags=["Hardware Config"])
-async def update_hardware_config(hardware_config: HardwareConfig):
-    write_hardware_config_file(serialize_config_options(hardware_config))
-    return(hardware_config)
 
 @app.get("/goggles/dimmer", response_model=BrightnessControl, tags=["Dimmer Control"])
 async def read_dimmer():
